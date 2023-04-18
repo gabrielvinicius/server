@@ -18,7 +18,7 @@ class Server:
         else:
             Server.__instance = self
 
-        self.host = '45.33.198.3'
+        self.host = '0.0.0.0'
         self.port = 9999
         self.server_socket = None
         self.clients = []
@@ -53,12 +53,14 @@ class Server:
 
     def broadcast_message(self, message, sender_name):
         for client in self.clients:
-            # if client['name'] != sender_name or True:
+            if client['name'] == sender_name:
+                sender_name = 'Você'
             client_socket = client['socket']
             timestamp = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
             try:
-                client_socket.send(f"{timestamp} - {sender_name}: {message}".encode())
-                print(f"{sender_name} : {message}")
+                text = f"{timestamp} - {sender_name}: {message}"
+                client_socket.send(text.encode())
+                print(text)
             except:
                 self.remove_client(client_socket, client['name'])
 
@@ -66,7 +68,10 @@ class Server:
         for client in self.clients:
             if client['socket'] == client_socket:
                 self.clients.remove(client)
-                print(f"{client_name} desconectado")
+                mensagem = f"{client_name} saiu"
+                print(mensagem)
+                self.broadcast_message(mensagem,'SERVIDOR')
+                #print(f"{client_name} desconectado")
                 break
 
 
