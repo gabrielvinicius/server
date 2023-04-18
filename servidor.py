@@ -18,7 +18,7 @@ class Server:
         else:
             Server.__instance = self
 
-        self.host = '45.33.198.3'
+        self.host = '0.0.0.0'
         self.port = 9999
         self.server_socket = None
         self.clients = []
@@ -35,7 +35,7 @@ class Server:
             client_name = client_socket.recv(1024).decode()
             mensagem = f"{client_name} conectado no ip {address}"
             print(mensagem)
-            self.broadcast_message(mensagem,'SERVIDOR')
+            self.broadcast_message(mensagem.encode,'SERVIDOR')
             self.clients.append({"socket": client_socket, "nome": client_name})
             client_thread = threading.Thread(target=self.handle_client_messages, args=(client_socket, client_name))
             client_thread.start()
