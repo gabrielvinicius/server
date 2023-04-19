@@ -33,13 +33,11 @@ class Server:
         while True:
             client_socket, address = self.server_socket.accept()
             client_name = client_socket.recv(1024).decode()
-            mensagem = f"{client_name} conectado no ip {address}"
-            print(mensagem)
-            self.broadcast_message(mensagem.encode,'SERVIDOR')
+            print(f"{client_name} conectado no ip {address}")
             self.clients.append({"socket": client_socket, "nome": client_name})
             client_thread = threading.Thread(target=self.handle_client_messages, args=(client_socket, client_name))
             client_thread.start()
-
+            self.broadcast_message(f"{client_name} conectado no ip {address}", "SERVIDOR")
 
     def handle_client_messages(self, client_socket, client_name):
         while True:
@@ -53,11 +51,12 @@ class Server:
 
     def broadcast_message(self, message, sender_name):
         for client in self.clients:
-            # if client['name'] != sender_name or True:
             client_socket = client['socket']
             timestamp = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
+            text = f"{timestamp} - {sender_name}: {message}"  
+                      
             try:
-                client_socket.send(f"{timestamp} - {sender_name}: {message}".encode())
+                client_socket.send(text.encode())
                 print(f"{sender_name} : {message}")
             except:
                 self.remove_client(client_socket, client['name'])
